@@ -30,11 +30,7 @@ canvas#stars { position:fixed; inset:0; z-index:1; pointer-events:none; }
 
 
 
-.gdot {
-  position:fixed; border-radius:50%; background:#e0b84a; z-index:2; pointer-events:none;
-  animation:gdotAnim var(--td) ease-in-out infinite var(--tdd);
-}
-@keyframes gdotAnim { 0%,100%{opacity:0.08;transform:scale(1)} 50%{opacity:0.55;transform:scale(1.8)} }
+
 
 .scene {
   position:relative; z-index:3;
@@ -46,21 +42,120 @@ canvas#stars { position:fixed; inset:0; z-index:1; pointer-events:none; }
   width:100%;
 }
 
-/* ── Dome ── */
+/* ── Dome CSS ── */
 .dome-wrap {
   opacity:0;
   animation:fadeDown 1.4s cubic-bezier(.22,1,.36,1) forwards 0.3s;
-  filter:drop-shadow(0 0 22px rgba(90,200,220,0.35)) drop-shadow(0 0 55px rgba(220,60,80,0.2));
-  transition:filter 0.5s, transform 0.4s;
   margin-bottom:28px;
-}
-.dome-wrap:hover {
-  filter:drop-shadow(0 0 38px rgba(100,220,240,0.6)) drop-shadow(0 0 80px rgba(230,80,100,0.4));
-  transform:translateY(-6px) scale(1.04);
+  cursor:pointer;
 }
 @keyframes fadeDown {
   from { opacity:0; transform:translateY(-24px); }
   to   { opacity:1; transform:translateY(0); }
+}
+
+.dome-outer {
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  filter:
+    drop-shadow(0 0 28px rgba(220,80,110,0.35))
+    drop-shadow(0 0 60px rgba(180,60,90,0.2));
+  transition: filter 0.4s, transform 0.4s;
+}
+.dome-outer:hover {
+  filter:
+    drop-shadow(0 0 45px rgba(240,100,130,0.6))
+    drop-shadow(0 0 90px rgba(200,60,90,0.35));
+  transform: translateY(-5px) scale(1.03);
+}
+
+/* the arch-shaped glass bell */
+.dome-glass-arch {
+  width: 180px;
+  height: 220px;
+  border-radius: 90px 90px 12px 12px;
+  position: relative;
+  overflow: hidden;
+  border: 1.5px solid rgba(200,210,230,0.35);
+  background: rgba(20,18,35,0.55);
+  box-shadow:
+    inset 0 0 60px rgba(220,80,110,0.18),
+    inset 0 0 20px rgba(255,180,200,0.08);
+}
+
+/* radial inner glow — rose-pink at centre like image */
+.dome-inner-glow {
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse 70% 65% at 50% 62%,
+    rgba(240,80,110,0.28) 0%,
+    rgba(180,50,80,0.12) 40%,
+    transparent 75%);
+  border-radius: inherit;
+  pointer-events:none;
+}
+
+/* glass shine streak on left */
+.dome-glass-arch::before {
+  content:'';
+  position:absolute;
+  top:14px; left:18px;
+  width:16px; height:80px;
+  background: rgba(255,255,255,0.1);
+  border-radius:10px;
+  transform:rotate(-12deg);
+  pointer-events:none;
+}
+/* subtle right shimmer */
+.dome-glass-arch::after {
+  content:'';
+  position:absolute;
+  top:30px; right:22px;
+  width:8px; height:45px;
+  background: rgba(255,255,255,0.05);
+  border-radius:6px;
+  transform:rotate(10deg);
+  pointer-events:none;
+}
+
+/* the rose emoji */
+.dome-rose {
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%, -25%);
+  font-size:82px;
+  line-height:1;
+  user-select:none;
+  pointer-events:none;
+  animation:roseFloat 4s ease-in-out infinite;
+  filter:
+    drop-shadow(0 0 12px rgba(240,60,80,0.7))
+    drop-shadow(0 0 28px rgba(200,40,60,0.4));
+}
+@keyframes roseFloat {
+  0%,100% { transform:translate(-50%,-25%) rotate(-4deg); }
+  50%      { transform:translate(-50%,-33%) rotate(4deg); }
+}
+
+
+
+/* wooden base plate */
+.dome-base-plate {
+  width:200px;
+  height:18px;
+  background: linear-gradient(180deg, #6b3a1f 0%, #3d1f0a 60%, #2a1408 100%);
+  border-radius:4px 4px 6px 6px;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(180,120,60,0.3);
+  position:relative;
+}
+.dome-base-plate::before {
+  content:'';
+  position:absolute;
+  top:4px; left:12px; right:12px; height:2px;
+  background:rgba(200,140,70,0.25);
+  border-radius:2px;
 }
 
 /* ── Title ── */
@@ -178,124 +273,22 @@ canvas#stars { position:fixed; inset:0; z-index:1; pointer-events:none; }
 
 <div class="bg"></div>
 <canvas id="stars"></canvas>
-<div id="gdots"></div>
 
 <div class="scene" id="scene">
 
   <!-- DOME -->
-  <div class="dome-wrap">
-    <svg width="160" height="220" viewBox="0 0 210 290" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="glassBody" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%"   stop-color="#a8dce8" stop-opacity="0.38"/>
-          <stop offset="18%"  stop-color="#d8f4fc" stop-opacity="0.18"/>
-          <stop offset="50%"  stop-color="#ecf9ff" stop-opacity="0.07"/>
-          <stop offset="82%"  stop-color="#c0e8f4" stop-opacity="0.16"/>
-          <stop offset="100%" stop-color="#88cce0" stop-opacity="0.30"/>
-        </linearGradient>
-        <radialGradient id="roseAura" cx="50%" cy="55%" r="48%">
-          <stop offset="0%"  stop-color="#ff8090" stop-opacity="0.28"/>
-          <stop offset="100%" stop-color="transparent"/>
-        </radialGradient>
-        <radialGradient id="groundGrad" cx="50%" cy="50%" r="50%">
-          <stop offset="0%"  stop-color="#f0e890" stop-opacity="0.5"/>
-          <stop offset="100%" stop-color="#d0c060" stop-opacity="0.1"/>
-        </radialGradient>
-        <linearGradient id="tealG" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%"   stop-color="#7ee0f0"/>
-          <stop offset="50%"  stop-color="#40c0d8"/>
-          <stop offset="100%" stop-color="#28a8c0"/>
-        </linearGradient>
-        <radialGradient id="capGrad" cx="35%" cy="25%" r="60%">
-          <stop offset="0%"  stop-color="#80d8e8"/>
-          <stop offset="100%" stop-color="#2898b8"/>
-        </radialGradient>
-        <radialGradient id="heartGrad" cx="40%" cy="30%" r="60%">
-          <stop offset="0%"  stop-color="#ff8090"/>
-          <stop offset="100%" stop-color="#c00820"/>
-        </radialGradient>
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="4" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <filter id="softGlow">
-          <feGaussianBlur stdDeviation="2" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <clipPath id="domeClip">
-          <path d="M24,268 L24,115 Q24,24 105,24 Q186,24 186,115 L186,268 Z"/>
-        </clipPath>
-      </defs>
+  <div class="dome-wrap" id="scene">
+    <div class="dome-outer">
+      <div class="dome-glass-arch">
+        <!-- inner glow background -->
+        <div class="dome-inner-glow"></div>
+        <!-- rose -->
+        <div class="dome-rose">🌹</div>
 
-      <!-- inner rose glow -->
-      <ellipse cx="105" cy="175" rx="64" ry="72" fill="url(#roseAura)" clip-path="url(#domeClip)"/>
-
-      <!-- 🌹 emoji rose via foreignObject, clipped inside dome -->
-      <foreignObject x="22" y="95" width="166" height="166" clip-path="url(#domeClip)">
-        <div xmlns="http://www.w3.org/1999/xhtml"
-             style="width:166px;height:166px;display:flex;align-items:center;justify-content:center;font-size:118px;line-height:1;user-select:none;pointer-events:none;">
-          🌹
-        </div>
-      </foreignObject>
-
-      <!-- sparkle 4-point stars outside dome -->
-      <g transform="translate(182,88)" fill="#50cce0">
-        <polygon points="0,-12 2.4,-2.4 12,0 2.4,2.4 0,12 -2.4,2.4 -12,0 -2.4,-2.4" opacity="0.9">
-          <animate attributeName="opacity" values="0.9;0.2;0.9" dur="1.8s" repeatCount="indefinite"/>
-          <animateTransform attributeName="transform" type="scale" values="1;1.25;1" dur="1.8s" repeatCount="indefinite"/>
-        </polygon>
-      </g>
-      <g transform="translate(20,182)" fill="#50cce0">
-        <polygon points="0,-9 1.8,-1.8 9,0 1.8,1.8 0,9 -1.8,1.8 -9,0 -1.8,-1.8" opacity="0.85">
-          <animate attributeName="opacity" values="0.85;0.18;0.85" dur="2.4s" repeatCount="indefinite"/>
-          <animateTransform attributeName="transform" type="scale" values="1;1.3;1" dur="2.4s" repeatCount="indefinite"/>
-        </polygon>
-      </g>
-      <g transform="translate(194,52)" fill="#50cce0">
-        <polygon points="0,-5 1,-1 5,0 1,1 0,5 -1,1 -5,0 -1,-1" opacity="0.7">
-          <animate attributeName="opacity" values="0.7;0.15;0.7" dur="1.5s" repeatCount="indefinite"/>
-        </polygon>
-      </g>
-
-      <!-- DOME GLASS (drawn over rose for glass effect) -->
-      <path d="M24,268 L24,115 Q24,24 105,24 Q186,24 186,115 L186,268 Z"
-            fill="url(#glassBody)"
-            stroke="url(#tealG)" stroke-width="5"
-            filter="url(#softGlow)"/>
-
-      <!-- glass shine -->
-      <path d="M40,100 Q45,50 72,36 L66,32 Q38,48 36,103 Z" fill="white" fill-opacity="0.22"/>
-      <path d="M40,130 Q41,113 49,105 L45,103 Q39,112 37,132 Z" fill="white" fill-opacity="0.15"/>
-
-      <!-- CAP -->
-      <ellipse cx="105" cy="30" rx="36" ry="13" fill="url(#capGrad)" stroke="url(#tealG)" stroke-width="3"/>
-      <ellipse cx="105" cy="24" rx="36" ry="9"  fill="url(#capGrad)" stroke="url(#tealG)" stroke-width="2.5"/>
-      <ellipse cx="93"  cy="20" rx="11" ry="4"  fill="white" fill-opacity="0.32" transform="rotate(-10,93,20)"/>
-
-      <!-- HEART -->
-      <g transform="translate(105,7)" filter="url(#glow)">
-        <path d="M0,6 C0,2 -5,-3 -9,0 C-13,3 -9,9 0,16 C9,9 13,3 9,0 C5,-3 0,2 0,6 Z"
-              fill="url(#heartGrad)" stroke="#a00010" stroke-width="0.8"/>
-        <ellipse cx="-3" cy="3" rx="2.5" ry="1.5" fill="white" fill-opacity="0.38" transform="rotate(-30,-3,3)"/>
-        <animate attributeName="opacity" values="1;0.75;1" dur="1.4s" repeatCount="indefinite"/>
-      </g>
-
-      <!-- ══ DOME FLAT BASE (bottom closing plate) ══ -->
-      <!-- solid floor that closes the dome at the bottom -->
-      <rect x="24" y="262" width="162" height="16" rx="0"
-            fill="#1e7898" stroke="url(#tealG)" stroke-width="0"/>
-      <!-- top rim of base — connects flush with dome walls -->
-      <rect x="20" y="260" width="170" height="14" rx="3"
-            fill="#1a6888" stroke="#50c8e0" stroke-width="3"/>
-      <!-- inner highlight on base top -->
-      <rect x="28" y="262" width="154" height="5" rx="2"
-            fill="white" fill-opacity="0.12"/>
-      <!-- bottom edge of base (slight depth) -->
-      <rect x="20" y="271" width="170" height="6" rx="2"
-            fill="#135570"/>
-      <!-- shadow beneath -->
-      <ellipse cx="105" cy="280" rx="82" ry="6" fill="black" fill-opacity="0.28"/>
-    </svg>
+      </div>
+      <!-- flat wooden base -->
+      <div class="dome-base-plate"></div>
+    </div>
   </div>
 
   <!-- TITLE -->
@@ -348,17 +341,10 @@ resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 requestAnimationFrame(drawStars);
 
-/* ── Gold dots ── */
-const gd = document.getElementById('gdots');
-for(let i=0;i<22;i++){
-  const d=document.createElement('div'); d.className='gdot';
-  const sz=1.5+Math.random()*3;
-  d.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--td:${1.5+Math.random()*3.5}s;--tdd:${Math.random()*3}s`;
-  gd.appendChild(d);
-}
+
 
 /* ── Click ── */
-document.getElementById('scene').addEventListener('click', e => {
+document.querySelector('.dome-wrap').addEventListener('click', e => {
   for(let i=0;i<22;i++){
     const sp=document.createElement('div'); sp.className='spark';
     const angle=(i/22)*Math.PI*2, dist=42+Math.random()*72;
