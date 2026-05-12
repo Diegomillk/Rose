@@ -354,45 +354,88 @@ document.querySelector('.dome-wrap').addEventListener('click', e => {
   }
 
   setTimeout(()=>{
-    // Overlay escuro
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:999;display:flex;align-items:center;justify-content:center;cursor:default;';
 
-    // Elemento de vídeo
-    const video = document.createElement('video');
-    video.src = 'Movie.mp4';
-    video.style.cssText = 'width:100%;height:100%;object-fit:contain;';
-    video.controls = true;
-    video.autoplay = true;
+    // Testa se Movie.mp4 existe na pasta local
+    fetch('Movie.mp4', { method: 'HEAD' })
+      .then(res => {
+        if (res.ok) {
+          abrirVideoLocal();
+        } else {
+          abrirYouTube();
+        }
+      })
+      .catch(() => {
+        abrirYouTube();
+      });
 
-    // Botão fechar
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = '✕';
-    closeBtn.style.cssText = 'position:absolute;top:16px;right:20px;background:rgba(255,255,255,0.15);border:none;color:white;font-size:22px;width:44px;height:44px;border-radius:50%;cursor:pointer;z-index:1000;';
-    closeBtn.onclick = () => {
-      video.pause();
-      document.exitFullscreen && document.exitFullscreen();
-      overlay.remove();
-    };
+    function abrirVideoLocal() {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:999;display:flex;align-items:center;justify-content:center;cursor:default;';
 
-    overlay.appendChild(video);
-    overlay.appendChild(closeBtn);
-    document.body.appendChild(overlay);
+      const video = document.createElement('video');
+      video.src = 'Movie.mp4';
+      video.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+      video.controls = true;
+      video.autoplay = true;
 
-    // Pedir tela cheia
-    video.play().then(() => {
-      if(video.requestFullscreen) video.requestFullscreen();
-      else if(video.webkitRequestFullscreen) video.webkitRequestFullscreen();
-    }).catch(()=>{
-      if(overlay.requestFullscreen) overlay.requestFullscreen();
-      else if(overlay.webkitRequestFullscreen) overlay.webkitRequestFullscreen();
-    });
+      // Se o vídeo não carregar mesmo assim, cai pro YouTube
+      video.addEventListener('error', () => {
+        overlay.remove();
+        abrirYouTube();
+      });
 
-    // Fechar overlay ao terminar o vídeo
-    video.addEventListener('ended', () => {
-      document.exitFullscreen && document.exitFullscreen();
-      overlay.remove();
-    });
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = '✕';
+      closeBtn.style.cssText = 'position:absolute;top:16px;right:20px;background:rgba(255,255,255,0.15);border:none;color:white;font-size:22px;width:44px;height:44px;border-radius:50%;cursor:pointer;z-index:1000;';
+      closeBtn.onclick = () => {
+        video.pause();
+        document.exitFullscreen && document.exitFullscreen();
+        overlay.remove();
+      };
+
+      overlay.appendChild(video);
+      overlay.appendChild(closeBtn);
+      document.body.appendChild(overlay);
+
+      video.play().then(() => {
+        if(video.requestFullscreen) video.requestFullscreen();
+        else if(video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+      }).catch(()=>{
+        if(overlay.requestFullscreen) overlay.requestFullscreen();
+        else if(overlay.webkitRequestFullscreen) overlay.webkitRequestFullscreen();
+      });
+
+      video.addEventListener('ended', () => {
+        document.exitFullscreen && document.exitFullscreen();
+        overlay.remove();
+      });
+    }
+
+    function abrirYouTube() {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:999;display:flex;align-items:center;justify-content:center;cursor:default;';
+
+      const iframe = document.createElement('iframe');
+      iframe.src = 'https://www.youtube.com/embed/0O6EUL8zGpY?autoplay=1&rel=0&playsinline=0';
+      iframe.style.cssText = 'width:100%;height:100%;border:none;';
+      iframe.allow = 'autoplay; fullscreen; accelerometer; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = '✕';
+      closeBtn.style.cssText = 'position:absolute;top:16px;right:20px;background:rgba(255,255,255,0.15);border:none;color:white;font-size:22px;width:44px;height:44px;border-radius:50%;cursor:pointer;z-index:1000;';
+      closeBtn.onclick = () => overlay.remove();
+
+      overlay.appendChild(iframe);
+      overlay.appendChild(closeBtn);
+      document.body.appendChild(overlay);
+
+      // Tela cheia no mobile
+      if (overlay.requestFullscreen) overlay.requestFullscreen();
+      else if (overlay.webkitRequestFullscreen) overlay.webkitRequestFullscreen();
+    }
+
   }, 350);
 });
 </script>
